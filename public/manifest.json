@@ -1,0 +1,21 @@
+{
+    "manifest_version": 3,
+    "name": "Project Moon",
+    "version": "0.1.0",
+    "description": "Chrome extension for accessibility",
+    "options_page": "options/index.html",
+    "icons": {
+      "16": "project_moon_16.png",
+      "32": "project_moon_32.png",
+      "48": "project_moon_48.png"
+    },
+    "permissions": ["activeTab"],
+    "action": {
+      "default_popup": "index.html",
+      "default_icon": {
+        "16": "project_moon_16.png",
+        "48": "project_moon_48.png",
+        "128": "project_moon_128.png"
+      }
+    }
+  }

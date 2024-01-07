@@ -1,0 +1,14 @@
+---
+interface Props {
+	title: string;
+	text: string;
+}
+
+const { title, text } = Astro.props;
+---
+
+
+<div class="w-[600px] h-[600px] flex flex-col justify-center items-center">
+    <h1 class="text-cyan-400 text-[65px] font-[700]">{title}</h1>
+    <p class="text-white font-xs">Chrome extension for <span class="text-cyan-400 font-medium">{text}</span></p>
+</div>
