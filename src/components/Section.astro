@@ -6,13 +6,54 @@ interface Props {
 const { title, text } = Astro.props;
 ---
 
-<div class="w-[600px] h-[600px] flex flex-col justify-center items-center">
-  <h1 class="text-cyan-400 text-[65px] font-[700]">{title}</h1>
-  <p class="text-white font-xs">
-    Chrome extension for <span class="text-cyan-400 font-medium">{text}</span>
-  </p>
-  <button id="inject-css" class="text-white font-[700] text-[14px] my-[5px]">Wstrzyknij CSS</button>
-  <button id="zoom-button" class="text-white font-[700] text-[14px] my-[5px[">Zoom</button>
+<div
+  class="w-[400px] min-h-min flex flex-col justify-start items-center bg-gray-800"
+>
+  <div class="border-b-[1px] w-full text-center pb-[1rem]">
+    <h1 class="text-cyan-400 text-[24px] font-[700]">{title}</h1>
+    <p class="text-white text-[16px] font-[600]">{text}</p>
+  </div>
+  <div class="flex flex-wrap">
+    <button
+      id="inject-css"
+      class="text-white font-[500] text-[14px] border-[1px]"
+      >Zmień kontrast strony</button
+    >
+    <button
+      id="zoom-button"
+      class="text-white font-[500] text-[14px] border-[1px]"
+      >Przybliż stronę</button
+    >
+    <button
+      id="dyslexia-font"
+      class="text-white font-[500] text-[14px] border-[1px]"
+      >Czcionka dla dyslektyków</button
+    >
+    <button
+      id="animation-button"
+      class="text-white font-[500] text-[14px] border-[1px]"
+      >Wyłaczenie animacji</button
+    >
+    <button id="test" class="text-white font-[500] text-[14px] border-[1px]"
+      >Test</button
+    >
+    <button id="test2" class="text-white font-[500] text-[14px] border-[1px]"
+      >Test2</button
+    >
+  </div>
 
+  <style>
+    #inject-css,
+    #zoom-button,
+    #dyslexia-font,
+    #animation-button,
+    #test,
+    #test2 {
+      width: 192px;
+      height: 192px;
+      background-color: #1a202c;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+    }
+  </style>
 </div>
-

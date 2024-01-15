@@ -8,7 +8,7 @@ export default defineConfig({
   integrations: [vue(), tailwind()],
   server: { port: 8282 },
   build: {
-    assets: 'astro'
+    assets: 'astro',
   },
-  outDir: 'projectmoon'
+  outDir: 'projectmoon',
 });
