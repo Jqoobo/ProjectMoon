@@ -1,4 +1,17 @@
-function updateStorage(url, data) {
+const cssStylesData = {
+  contrast: { code: "body { background-color: #000 !important; }", isInjected: false },
+  animation: { code: "body { animation: none !important; transition: none !important; }", isInjected: false },
+};
+
+const zoomLevels = [1.0, 1.2, 1.3, 0.5];
+
+function getStorageData(url, callback) {
+  chrome.storage.local.get([url], (result) => {
+    callback(result[url] || {});
+  });
+}
+
+function updateStorageData(url, data) {
   chrome.storage.local.set({ [url]: data });
 }
 
@@ -16,104 +29,63 @@ function removeCSS(tabId, cssCode) {
   });
 }
 
+function toggleCSSInjection(tabId, url, styleKey) {
+  getStorageData(url, (data) => {
+    if (!data[styleKey]) {
+      data[styleKey] = { ...cssStylesData[styleKey] };
+    }
+
+    if (!data[styleKey].isInjected) {
+      applyCSS(tabId, data[styleKey].code);
+      data[styleKey].isInjected = true;
+    } else {
+      removeCSS(tabId, data[styleKey].code);
+      data[styleKey].isInjected = false;
+    }
+    updateStorageData(url, data);
+  });
+}
+
+function applyZoom(tabId, zoomLevel) {
+  chrome.tabs.setZoom(tabId, zoomLevel);
+}
+
+function toggleZoom(tabId, url) {
+  getStorageData(url, (data) => {
+    if (!data.currentZoomLevel) {
+      data.currentZoomLevel = 1.0;
+    }
+
+    let nextZoomIndex = (zoomLevels.indexOf(data.currentZoomLevel) + 1) % zoomLevels.length;
+    data.currentZoomLevel = zoomLevels[nextZoomIndex];
+
+    applyZoom(tabId, data.currentZoomLevel);
+    updateStorageData(url, data);
+  });
+}
+
 document.addEventListener("DOMContentLoaded", function () {
-  const injectButton = document.getElementById("inject-css");
-  const zoomButton = document.getElementById("zoom-button");
-  const dyslexiaButton = document.getElementById("dyslexia-font");
-  const animationButton = document.getElementById("animation-button");
-  const cssCode = "body { background-color: #000 !important; }";
-  const animationCssCode =
-    "body { animation: none !important; transition: none !important; }";
-  const zoomLevels = [1.0, 1.2, 1.3, 1.5];
-  let currentZoomLevel = 1;
+  const buttons = {
+    inject: document.getElementById("inject-css"),
+    zoom: document.getElementById("zoom-button"),
+    animation: document.getElementById("animation-button"),
+    // Add other buttons if needed
+  };
 
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     const tab = tabs[0];
     const url = new URL(tab.url).origin;
 
-    injectButton.addEventListener("click", () => {
-      chrome.storage.local.get([url], (result) => {
-        const isInjected = result[url] && result[url].isCssInjected;
-        if (!isInjected) {
-          applyCSS(tab.id, cssCode);
-          updateStorage(url, { ...result[url], isCssInjected: true });
-        } else {
-          removeCSS(tab.id, cssCode);
-          updateStorage(url, { ...result[url], isCssInjected: false });
-        }
-      });
+    buttons.inject.addEventListener("click", () => {
+      toggleCSSInjection(tab.id, url, "contrast", cssStylesData);
     });
 
-    chrome.storage.local.get([url], (result) => {
-      if (result[url] && result[url].zoomLevel) {
-        currentZoomLevel = zoomLevels.indexOf(result[url].zoomLevel);
-        if (currentZoomLevel === -1) currentZoomLevel = 3; // Ustaw domyślny poziom, jeśli nie znaleziono
-      }
+    buttons.zoom.addEventListener("click", () => {
+      toggleZoom(tab.id, url);
     });
 
-    zoomButton.addEventListener("click", () => {
-      currentZoomLevel = (currentZoomLevel + 1) % zoomLevels.length;
-      const zoomCssCode = `body { zoom: ${zoomLevels[currentZoomLevel]}; }`;
-      applyCSS(tab.id, zoomCssCode);
-
-      // Aktualizacja chrome.storage z nowym poziomem zoomu
-      chrome.storage.local.get([url], (result) => {
-        const settings = result[url] || {};
-        settings.zoomLevel = zoomLevels[currentZoomLevel];
-        updateStorage(url, settings);
-      });
-    });
-
-    dyslexiaButton.addEventListener("click", function () {
-      chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-        const url = new URL(tabs[0].url).origin;
-        chrome.scripting.executeScript({
-          target: { tabId: tabs[0].id },
-          function: fontToggle,
-          args: [url], // Przekazuje URL jako argument
-        });
-      });
-    });
-
-    function fontToggle(url) {
-      const stylesheetId = "opendyslexic-stylesheet";
-      let link = document.getElementById(stylesheetId);
-
-      chrome.storage.local.get([url], (result) => {
-        let isFontEnabled = result[url] ? result[url].isFontEnabled : false;
-
-        if (!isFontEnabled) {
-          // Jeśli czcionka jest wyłączona, dodaj ją i zaktualizuj stan
-          if (!link) {
-            link = document.createElement("link");
-            link.id = stylesheetId;
-            link.href = chrome.runtime.getURL("assets/css/opendyslexic.css");
-            link.type = "text/css";
-            link.rel = "stylesheet";
-            document.head.appendChild(link);
-          }
-          chrome.storage.local.set({ [url]: { isFontEnabled: true } });
-        } else {
-          // Jeśli czcionka jest włączona, usuń ją i zaktualizuj stan
-          if (link) {
-            link.remove();
-          }
-          chrome.storage.local.set({ [url]: { isFontEnabled: false } });
-        }
-      });
-    }
-
-    animationButton.addEventListener("click", () => {
-      chrome.storage.local.get([url], (result) => {
-        const animationInjection = result[url] && result[url].isAnimInjected;
-        if (!animationInjection) {
-          applyCSS(tab.id, animationCssCode);
-          updateStorage(url, { ...result[url], isAnimInjected: true });
-        } else {
-          removeCSS(tab.id, animationCssCode);
-          updateStorage(url, { ...result[url], isAnimInjected: false });
-        }
-      });
+    buttons.animation.addEventListener("click", () => {
+      toggleCSSInjection(tab.id, url, "animation", cssStylesData);
     });
   });
 });

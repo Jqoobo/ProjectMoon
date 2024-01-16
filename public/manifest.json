@@ -17,6 +17,12 @@
       "matches": ["<all_urls>"]
     }
   ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["assets/js/active.js"]
+    }
+  ],
   "action": {
     "default_popup": "index.html",
     "default_icon": {
