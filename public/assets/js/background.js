@@ -1,5 +1,5 @@
 function insertCSSIfNeeded(tabId, url, settings) {
-  Object.keys(settings).forEach(key => {
+  Object.keys(settings).forEach((key) => {
     if (settings[key].isInjected) {
       chrome.scripting.insertCSS({
         target: { tabId: tabId },

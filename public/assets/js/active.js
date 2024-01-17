@@ -1,3 +1,4 @@
+//Syntezator mowy Web Speech API
 if ("speechSynthesis" in window) {
   let lastSpokenText = "";
 
@@ -13,7 +14,7 @@ if ("speechSynthesis" in window) {
       utterance.onerror = function (event) {
         if (event.error !== "interrupted") {
           console.error(
-            "Wystąpił błąd podczas syntezowania mowy:",
+            "🧐Podczas syntezowania mowy, wystąpił błąd:",
             event.error
           );
         }
@@ -21,6 +22,7 @@ if ("speechSynthesis" in window) {
 
       window.speechSynthesis.speak(utterance);
       lastSpokenText = text;
+      console.log("📢:", text);
     }
   }
 
@@ -43,5 +45,30 @@ if ("speechSynthesis" in window) {
     }
   });
 } else {
-  console.error("Przeglądarka nie obsługuje Web Speech API");
+  console.error("Twoja przeglądarka nie obsługuje Web Speech API 😞");
 }
+
+//Ładownanie czcionki OpenDyslexic w postaci assetu
+function loadStylesheet(url) {
+  return new Promise((resolve, reject) => {
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.type = "text/css";
+    link.crossOrigin = "anonymous";
+    link.id = "projectmoon_opendyslexic_font";
+    link.href = url;
+    link.onload = resolve;
+    link.onerror = reject;
+    document.head.appendChild(link);
+  });
+}
+
+loadStylesheet(chrome.runtime.getURL("assets/css/opendyslexic.css"))
+  .then(() => {
+    // Stylesheet loaded successfully
+    console.log("✅Asset został załadowany (OpenDyslexic)");
+  })
+  .catch((error) => {
+    // Error loading stylesheet
+    console.error("❌Asset nie został załadowany:", error);
+  });

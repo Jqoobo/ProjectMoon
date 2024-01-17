@@ -1,9 +1,19 @@
-const cssStylesData = {
-  contrast: { code: "body { background-color: #000 !important; }", isInjected: false },
-  animation: { code: "body { animation: none !important; transition: none !important; }", isInjected: false },
+let cssStylesData = {
+  contrast: {
+    code: "body { background-color: #000 !important; }",
+    isInjected: false,
+  },
+  animation: {
+    code: "body { animation: none !important; transition: none !important; }",
+    isInjected: false,
+  },
+  font: {
+    code: "* { font-family: OpenDyslexic !important;",
+    isInjected: false,
+  },
 };
 
-const zoomLevels = [1.0, 1.2, 1.3, 0.5];
+const zoomLevels = [1.0, 1.2, 1.3, 1.5];
 
 function getStorageData(url, callback) {
   chrome.storage.local.get([url], (result) => {
@@ -56,7 +66,8 @@ function toggleZoom(tabId, url) {
       data.currentZoomLevel = 1.0;
     }
 
-    let nextZoomIndex = (zoomLevels.indexOf(data.currentZoomLevel) + 1) % zoomLevels.length;
+    let nextZoomIndex =
+      (zoomLevels.indexOf(data.currentZoomLevel) + 1) % zoomLevels.length;
     data.currentZoomLevel = zoomLevels[nextZoomIndex];
 
     applyZoom(tabId, data.currentZoomLevel);
@@ -69,7 +80,7 @@ document.addEventListener("DOMContentLoaded", function () {
     inject: document.getElementById("inject-css"),
     zoom: document.getElementById("zoom-button"),
     animation: document.getElementById("animation-button"),
-    // Add other buttons if needed
+    dyslexia: document.getElementById("dyslexia-font"),
   };
 
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -86,6 +97,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     buttons.animation.addEventListener("click", () => {
       toggleCSSInjection(tab.id, url, "animation", cssStylesData);
+    });
+
+    buttons.dyslexia.addEventListener("click", () => {
+      toggleCSSInjection(tab.id, url, "font", cssStylesData);
     });
   });
 });
