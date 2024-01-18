@@ -146,6 +146,62 @@ document.addEventListener("DOMContentLoaded", function () {
     dyslexia: document.getElementById("dyslexia-font"),
   };
 
+  document
+    .getElementById("volumeSlider")
+    .addEventListener("change", function () {
+      let volume = this.value;
+      chrome.storage.sync.set({ volume: volume }, function () {
+        console.log("Volume is set to " + volume);
+      });
+      chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, { volume: volume });
+      });
+    });
+
+  let isMuted = false;
+  let previousVolume = 50;
+
+  // Pobierz stan wyciszenia i poprzednią wartość głośności po załadowaniu skryptu
+  chrome.storage.sync.get(["isMuted", "previousVolume"], function (data) {
+    isMuted = data.isMuted || false;
+    previousVolume = data.previousVolume || 50;
+    document.getElementById("muteButton").textContent = isMuted
+      ? "Odcisz"
+      : "Wycisz";
+  });
+
+  document.getElementById("muteButton").addEventListener("click", function () {
+    let volumeSlider = document.getElementById("volumeSlider");
+    let muteButton = document.getElementById("muteButton");
+    if (isMuted) {
+      // Odciszanie
+      volumeSlider.value = previousVolume;
+      muteButton.textContent = "Wycisz";
+      isMuted = false;
+    } else {
+      // Wyciszanie
+      previousVolume = volumeSlider.value;
+      volumeSlider.value = 0;
+      muteButton.textContent = "Odcisz";
+      isMuted = true;
+    }
+
+    let volume = volumeSlider.value;
+    chrome.storage.sync.set(
+      { volume: volume, isMuted: isMuted, previousVolume: previousVolume },
+      function () {
+        console.log("Volume is set to " + volume);
+      }
+    );
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      chrome.tabs.sendMessage(tabs[0].id, { volume: volume });
+    });
+  });
+
+  chrome.storage.sync.get("volume", function (data) {
+    document.getElementById("volumeSlider").value = data.volume || 50;
+  });
+
   chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
     const tab = tabs[0];
     const url = new URL(tab.url).origin;

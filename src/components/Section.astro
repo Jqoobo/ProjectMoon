@@ -14,6 +14,10 @@ const { title, text } = Astro.props;
     <p class="text-white text-[16px] font-[600]">{text}</p>
   </div>
   <div class="flex flex-wrap">
+    <div class="volume-buttons">
+    <button id="muteButton" class="text-white font-[500] text-[14px]">Wycisz</button>
+    <input type="range" id="volumeSlider" min="0" max="100" value="100" step="20">
+  </div>
     <button
       id="inject-css"
       class="text-white font-[500] text-[14px] border-[1px]"
@@ -35,6 +39,8 @@ const { title, text } = Astro.props;
       >Wyłaczenie animacji</button
     >
   </div>
+</div>
+
 
   <style>
     #inject-css,
@@ -49,5 +55,13 @@ const { title, text } = Astro.props;
       cursor: pointer;
       transition: all 0.2s ease-in-out;
     }
+    .volume-buttons {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      width: 400px;
+      height: 100px;
+      background-color: #1a202c;
+    }
   </style>
-</div>
