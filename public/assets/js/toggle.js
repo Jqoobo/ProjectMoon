@@ -68,7 +68,7 @@ async function toggleCSSInjection(
     };
   }
 
-  if (button) {
+  if (button && text1 && text2 && text3) {
     data[styleKey].clickCount = (data[styleKey].clickCount + 1) % STATES_COUNT;
 
     switch (data[styleKey].clickCount) {
@@ -96,9 +96,11 @@ async function toggleCSSInjection(
     if (!data[styleKey].isInjected) {
       await applyCSS(tabId, data[styleKey].code);
       data[styleKey].isInjected = true;
+      button.textContent = text1;
     } else {
       await removeCSS(tabId, data[styleKey].code);
       data[styleKey].isInjected = false;
+      button.textContent = text2;
     }
   }
 
@@ -127,6 +129,13 @@ async function toggleZoom(tabId, url) {
 
   await applyZoom(tabId, data.currentZoomLevel);
   await updateStorageData(url, data);
+
+  const zoomButton = document.getElementById("zoom-button");
+  const buttonText =
+    zoomLevels[nextZoomIndex] === 1.0
+      ? "Zoom 1x"
+      : `Zoom ${zoomLevels[nextZoomIndex]}x`;
+  zoomButton.textContent = buttonText;
 }
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -143,6 +152,19 @@ document.addEventListener("DOMContentLoaded", function () {
     const data = await getStorageData(url);
     if (data.buttonText && data.buttonText.contrast) {
       buttons.inject.textContent = data.buttonText.contrast;
+    }
+    if (data.buttonText && data.buttonText.animation) {
+      buttons.animation.textContent = data.buttonText.animation;
+    }
+    if (data.buttonText && data.buttonText.font) {
+      buttons.dyslexia.textContent = data.buttonText.font;
+    }
+    if (data.currentZoomLevel) {
+      const buttonText =
+        data.currentZoomLevel === 1.0
+          ? "Zoom 1x"
+          : `Zoom ${data.currentZoomLevel}x`;
+      buttons.zoom.textContent = buttonText;
     }
 
     buttons.inject.addEventListener("click", async () => {
@@ -162,11 +184,25 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     buttons.animation.addEventListener("click", async () => {
-      await toggleCSSInjection(tab.id, url, ANIMATION);
+      await toggleCSSInjection(
+        tab.id,
+        url,
+        ANIMATION,
+        buttons.animation,
+        "Animacja",
+        "Brak"
+      );
     });
 
     buttons.dyslexia.addEventListener("click", async () => {
-      await toggleCSSInjection(tab.id, url, FONT);
+      await toggleCSSInjection(
+        tab.id,
+        url,
+        FONT,
+        buttons.dyslexia,
+        "Czcionka",
+        "Brak"
+      );
     });
   });
 });
