@@ -13,12 +13,10 @@ if ("speechSynthesis" in window) {
       utterance.text = text;
 
       utterance.onerror = function (event) {
-        if (event.error !== "interrupted") {
-          console.error(
-            "🧐Podczas syntezowania mowy, wystąpił błąd:",
-            event.error
-          );
-        }
+        console.error(
+          "🧐Podczas syntezowania mowy, wystąpił błąd:",
+          event.error
+        );
       };
 
       window.speechSynthesis.speak(utterance);
@@ -46,12 +44,16 @@ if ("speechSynthesis" in window) {
     }
   });
 
+  chrome.storage.sync.get(["volume"], function (data) {
+    utterance.volume = data.volume ? data.volume / 100 : 1;
+  });
+
   chrome.runtime.onMessage.addListener(function (
     request,
     sender,
     sendResponse
   ) {
-    if (request.volume) {
+    if (sender.id === chrome.runtime.id && request.volume !== undefined) {
       utterance.volume = request.volume / 100;
     }
   });
@@ -76,7 +78,8 @@ function loadStylesheet(url) {
 
 loadStylesheet(chrome.runtime.getURL("assets/css/opendyslexic.css"))
   .then(() => {
-    // Stylesheet loaded successfully
     console.log("✅Asset został załadowany (OpenDyslexic)");
   })
-  .catch(console.error);
+  .catch((error) => {
+    console.error(error);
+  });

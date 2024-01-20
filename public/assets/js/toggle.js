@@ -3,27 +3,24 @@ const ANIMATION = "animation";
 const FONT = "font";
 const STATES_COUNT = 3;
 
-const cssStylesData = new Map([
-  [
-    CONTRAST,
-    { code: "body { background-color: #000 !important; }", isInjected: false },
-  ],
-  [
-    CONTRAST + "2",
-    { code: "body { background-color: #fff !important; }", isInjected: false },
-  ],
-  [
-    ANIMATION,
-    {
-      code: "body { animation: none !important; transition: none !important; }",
-      isInjected: false,
-    },
-  ],
-  [
-    FONT,
-    { code: "* { font-family: OpenDyslexic !important; }", isInjected: false },
-  ],
-]);
+const cssStylesData = {
+  [CONTRAST]: {
+    code: "body { background-color: #000 !important; }",
+    isInjected: false,
+  },
+  [CONTRAST + "2"]: {
+    code: "body { background-color: #fff !important; }",
+    isInjected: false,
+  },
+  [ANIMATION]: {
+    code: "body { animation: none !important; transition: none !important; }",
+    isInjected: false,
+  },
+  [FONT]: {
+    code: "* { font-family: OpenDyslexic !important; }",
+    isInjected: false,
+  },
+};
 
 const zoomLevels = [1.0, 1.2, 1.3, 1.5];
 
@@ -50,6 +47,16 @@ async function removeCSS(tabId, cssCode) {
   });
 }
 
+async function updateCSSState(tabId, data, styleKey, cssCode, isInjected) {
+  if (isInjected) {
+    await applyCSS(tabId, cssCode);
+  } else {
+    await removeCSS(tabId, cssCode);
+  }
+  data[styleKey].code = cssCode;
+  data[styleKey].isInjected = isInjected;
+}
+
 async function toggleCSSInjection(
   tabId,
   url,
@@ -62,7 +69,7 @@ async function toggleCSSInjection(
   const data = await getStorageData(url);
   if (!data[styleKey]) {
     data[styleKey] = {
-      ...cssStylesData.get(styleKey),
+      ...cssStylesData[styleKey],
       clickCount: 0,
       isInjected: false,
     };
@@ -73,35 +80,37 @@ async function toggleCSSInjection(
 
     switch (data[styleKey].clickCount) {
       case 0:
-        await removeCSS(tabId, data[styleKey].code);
-        data[styleKey].code = cssStylesData.get(styleKey).code;
-        data[styleKey].isInjected = false;
+        await updateCSSState(
+          tabId,
+          data,
+          styleKey,
+          cssStylesData[styleKey].code,
+          false
+        );
         button.textContent = text1;
         break;
       case 1:
-        await applyCSS(tabId, data[styleKey].code);
-        data[styleKey].isInjected = true;
+        await updateCSSState(tabId, data, styleKey, data[styleKey].code, true);
         button.textContent = text2;
         break;
       case 2:
-        await removeCSS(tabId, data[styleKey].code);
-        data[styleKey].code = cssStylesData.get(styleKey + "2")
-          ? cssStylesData.get(styleKey + "2").code
+        const newCode = cssStylesData[styleKey + "2"]
+          ? cssStylesData[styleKey + "2"].code
           : data[styleKey].code;
-        await applyCSS(tabId, data[styleKey].code);
+        await updateCSSState(tabId, data, styleKey, newCode, true);
         button.textContent = text3;
         break;
     }
   } else {
-    if (!data[styleKey].isInjected) {
-      await applyCSS(tabId, data[styleKey].code);
-      data[styleKey].isInjected = true;
-      button.textContent = text1;
-    } else {
-      await removeCSS(tabId, data[styleKey].code);
-      data[styleKey].isInjected = false;
-      button.textContent = text2;
-    }
+    const isInjected = !data[styleKey].isInjected;
+    await updateCSSState(
+      tabId,
+      data,
+      styleKey,
+      data[styleKey].code,
+      isInjected
+    );
+    button.textContent = isInjected ? text1 : text2;
   }
 
   if (button && !data.buttonText) {
@@ -146,61 +155,85 @@ document.addEventListener("DOMContentLoaded", function () {
     dyslexia: document.getElementById("dyslexia-font"),
   };
 
-  document
-    .getElementById("volumeSlider")
-    .addEventListener("change", function () {
-      let volume = this.value;
-      chrome.storage.sync.set({ volume: volume }, function () {
-        console.log("Volume is set to " + volume);
-      });
-      chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, { volume: volume });
-      });
-    });
-
+  let debounceTimer;
   let isMuted = false;
-  let previousVolume = 50;
+  let previousVolume = 100;
 
-  // Pobierz stan wyciszenia i poprzednią wartość głośności po załadowaniu skryptu
-  chrome.storage.sync.get(["isMuted", "previousVolume"], function (data) {
+  chrome.storage.sync.get(["volume", "isMuted"], function (data) {
     isMuted = data.isMuted || false;
-    previousVolume = data.previousVolume || 50;
+    previousVolume = data.volume !== undefined ? data.volume : 100;
+
+    document.getElementById("volumeSlider").value = previousVolume;
+
     document.getElementById("muteButton").textContent = isMuted
       ? "Odcisz"
       : "Wycisz";
   });
 
+  document
+    .getElementById("volumeSlider")
+    .addEventListener("input", function () {
+      let volume = this.value;
+      if (!isMuted) {
+        previousVolume = volume;
+      }
+      let muteButton = document.getElementById("muteButton");
+      muteButton.textContent = volume == 0 ? "Odcisz" : "Wycisz";
+      isMuted = volume == 0;
+
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(function () {
+        chrome.storage.sync.set(
+          { volume: volume, isMuted: isMuted, previousVolume: previousVolume },
+          function () {
+            if (chrome.runtime.lastError) {
+              console.log("Error: ", chrome.runtime.lastError);
+            } else {
+              console.log("Volume is set to " + volume);
+              updateVolume(volume);
+            }
+          }
+        );
+      }, 175);
+    });
+
   document.getElementById("muteButton").addEventListener("click", function () {
     let volumeSlider = document.getElementById("volumeSlider");
-    let muteButton = document.getElementById("muteButton");
+    let muteButton = this;
+
     if (isMuted) {
-      // Odciszanie
-      volumeSlider.value = previousVolume;
+      let newVolume = previousVolume;
+      volumeSlider.value = newVolume > 0 ? newVolume : 75;
       muteButton.textContent = "Wycisz";
       isMuted = false;
+      updateVolume(volumeSlider.value);
     } else {
-      // Wyciszanie
       previousVolume = volumeSlider.value;
       volumeSlider.value = 0;
       muteButton.textContent = "Odcisz";
       isMuted = true;
+      updateVolume(0);
     }
 
-    let volume = volumeSlider.value;
     chrome.storage.sync.set(
-      { volume: volume, isMuted: isMuted, previousVolume: previousVolume },
+      {
+        volume: volumeSlider.value,
+        isMuted: isMuted,
+        previousVolume: previousVolume,
+      },
       function () {
-        console.log("Volume is set to " + volume);
+        console.log("Volume is set to " + volumeSlider.value);
       }
     );
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      chrome.tabs.sendMessage(tabs[0].id, { volume: volume });
-    });
   });
 
-  chrome.storage.sync.get("volume", function (data) {
-    document.getElementById("volumeSlider").value = data.volume || 50;
-  });
+  function updateVolume(volume) {
+    chrome.tabs.query({}, function (tabs) {
+      tabs.forEach(function (tab) {
+        chrome.tabs.sendMessage(tab.id, { volume: volume });
+      });
+    });
+  }
 
   chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
     const tab = tabs[0];

@@ -8,7 +8,7 @@ function insertCSSIfNeeded(tabId, settings) {
         })
         .catch((error) => {
           console.error(
-            `❌Błąd podczas wstawiania CSS dla klucza ${key}:`,
+            `❌Wystąpił bład podczas dodawania CSS dla klucza ${key}:`,
             error
           );
         });
@@ -18,11 +18,18 @@ function insertCSSIfNeeded(tabId, settings) {
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status === "complete" && tab.url) {
-    const url = new URL(tab.url).origin;
-    chrome.storage.local.get([url], (result) => {
-      if (result[url]) {
-        insertCSSIfNeeded(tabId, result[url]);
-      }
-    });
+    try {
+      const url = new URL(tab.url).origin;
+      chrome.storage.local.get([url], (result) => {
+        if (result[url]) {
+          insertCSSIfNeeded(tabId, result[url]);
+          console.log(`✅Zastosowano ustawienia dla: ${url}`);
+        } else {
+          console.error(`❌Nie znaleziono ustawień dla: ${url}`);
+        }
+      });
+    } catch (error) {
+      console.error(`❌Nieprawidłowy URL: ${tab.url}`, error);
+    }
   }
 });
