@@ -1,3 +1,4 @@
+//Zmienne globalne
 const CONTRAST = "contrast";
 const ANIMATION = "animation";
 const FONT = "font";
@@ -22,32 +23,76 @@ const cssStylesData = {
   },
 };
 
+//Tablica z poziomami zoomu
 const zoomLevels = [1.0, 1.2, 1.3, 1.5];
 
+// Funkcja, która pobiera dane z chrome.storage.local
 async function getStorageData(url) {
-  const result = await chrome.storage.local.get([url]);
-  return result[url] || {};
+  try {
+    const result = await chrome.storage.local.get([url]);
+    return result[url] || {};
+  } catch (error) {
+    console.error(
+      `❌Wystąpił błąd, podczas próby pobierania danych z chrome.storage dla: ${url}`,
+      error
+    );
+    return {};
+  }
 }
 
+// Funkcja, która aktualizuje dane w chrome.storage.local
 async function updateStorageData(url, data) {
-  await chrome.storage.local.set({ [url]: data });
+  try {
+    await chrome.storage.local.set({ [url]: data });
+  } catch (error) {
+    console.error(
+      `❌Wystąpił błąd, podczas próby aktualizacji danych w chrome.storage dla: ${url}`,
+      error
+    );
+  }
 }
 
+// Funkcja, która wstrzykuje CSS do strony
 async function applyCSS(tabId, cssCode) {
-  await chrome.scripting.insertCSS({
-    target: { tabId },
-    css: cssCode,
-  });
+  try {
+    await chrome.scripting.insertCSS({
+      target: { tabId },
+      css: cssCode,
+    });
+  } catch (error) {
+    console.error(
+      `❌Wystąpił błąd, podczas próby wstrzykiwania kodu CSS do strony, której ID zakładki to: ${tabId}`,
+      error
+    );
+  }
 }
 
+// Funkcja, która usuwa wstrzyknięte CSS ze strony
 async function removeCSS(tabId, cssCode) {
-  await chrome.scripting.removeCSS({
-    target: { tabId },
-    css: cssCode,
-  });
+  try {
+    await chrome.scripting.removeCSS({
+      target: { tabId },
+      css: cssCode,
+    });
+  } catch (error) {
+    console.error(
+      `❌Wystąpił błąd, podczas próby usuwania kodu CSS ze strony, której ID zakładki to: ${tabId}`,
+      error
+    );
+  }
 }
 
+// Funkcja, która aktualizuje stan CSS
 async function updateCSSState(tabId, data, styleKey, cssCode, isInjected) {
+  if (typeof data[styleKey] !== "object") {
+    console.error(
+      `❓Oczekiwano obiektu dla klucza stylu: ${styleKey}, ✅otrzymano: ${typeof data[
+        styleKey
+      ]}`
+    );
+    return;
+  }
+
   if (isInjected) {
     await applyCSS(tabId, cssCode);
   } else {
@@ -57,6 +102,7 @@ async function updateCSSState(tabId, data, styleKey, cssCode, isInjected) {
   data[styleKey].isInjected = isInjected;
 }
 
+//Funkcja, która włącza/wyłącza wstrzyknięcie CSS (do wyboru: przycisk podstawowy, przycisk z 3 stanami)
 async function toggleCSSInjection(
   tabId,
   url,
@@ -80,37 +126,42 @@ async function toggleCSSInjection(
 
     switch (data[styleKey].clickCount) {
       case 0:
-        await updateCSSState(
-          tabId,
-          data,
-          styleKey,
-          cssStylesData[styleKey].code,
-          false
-        );
+        data[styleKey].isInjected = false;
+        await updateCSSState(tabId, data, styleKey, data[styleKey].code, false);
         button.textContent = text1;
         break;
       case 1:
-        await updateCSSState(tabId, data, styleKey, data[styleKey].code, true);
+        const code1 = cssStylesData[styleKey]
+          ? cssStylesData[styleKey].code
+          : "";
+        data[styleKey].isInjected = true;
+        await updateCSSState(tabId, data, styleKey, code1, true);
         button.textContent = text2;
         break;
       case 2:
-        const newCode = cssStylesData[styleKey + "2"]
+        data[styleKey].isInjected = false;
+        await updateCSSState(tabId, data, styleKey, data[styleKey].code, false);
+        const code2 = cssStylesData[styleKey + "2"]
           ? cssStylesData[styleKey + "2"].code
-          : data[styleKey].code;
-        await updateCSSState(tabId, data, styleKey, newCode, true);
+          : "";
+        data[styleKey].isInjected = true;
+        await updateCSSState(tabId, data, styleKey, code2, true);
         button.textContent = text3;
         break;
     }
   } else {
-    const isInjected = !data[styleKey].isInjected;
+    data[styleKey].isInjected = !data[styleKey].isInjected;
     await updateCSSState(
       tabId,
       data,
       styleKey,
       data[styleKey].code,
-      isInjected
+      data[styleKey].isInjected
     );
-    button.textContent = isInjected ? text1 : text2;
+
+    if (button) {
+      button.textContent = data[styleKey].isInjected ? text1 : text2;
+    }
   }
 
   if (button && !data.buttonText) {
@@ -122,10 +173,12 @@ async function toggleCSSInjection(
   await updateStorageData(url, data);
 }
 
+//Funkcja, która włącza/wyłącza zoom
 async function applyZoom(tabId, zoomLevel) {
   await chrome.tabs.setZoom(tabId, zoomLevel);
 }
 
+//Funkcja, która aktualizuje stan zoomu
 async function toggleZoom(tabId, url) {
   const data = await getStorageData(url);
   if (!data.currentZoomLevel) {
@@ -147,18 +200,13 @@ async function toggleZoom(tabId, url) {
   zoomButton.textContent = buttonText;
 }
 
+//Funkcja pobierająca DOM strony
 document.addEventListener("DOMContentLoaded", function () {
-  const buttons = {
-    inject: document.getElementById("inject-css"),
-    zoom: document.getElementById("zoom-button"),
-    animation: document.getElementById("animation-button"),
-    dyslexia: document.getElementById("dyslexia-font"),
-  };
-
+  //Zmienne dla głosności Web Speech API
   let debounceTimer;
   let isMuted = false;
   let previousVolume = 100;
-
+  //Funkcje aktualizujące oraz synchronizujące głośność Web Speech API
   chrome.storage.sync.get(["volume", "isMuted"], function (data) {
     isMuted = data.isMuted || false;
     previousVolume = data.volume !== undefined ? data.volume : 100;
@@ -235,10 +283,21 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  //Zmienne przyjmujące wartości przycisków
+  const buttons = {
+    inject: document.getElementById("inject-css"),
+    zoom: document.getElementById("zoom-button"),
+    animation: document.getElementById("animation-button"),
+    dyslexia: document.getElementById("dyslexia-font"),
+  };
+
+  //Funkcja, która pobiera dane obecnie aktywnie otwartej zakładki w oknie przeglądarki
   chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
     const tab = tabs[0];
     const url = new URL(tab.url).origin;
     const data = await getStorageData(url);
+
+    //Warunki sprawdzające, czy przyciski mają tekst
     if (data.buttonText && data.buttonText.contrast) {
       buttons.inject.textContent = data.buttonText.contrast;
     }
@@ -248,6 +307,8 @@ document.addEventListener("DOMContentLoaded", function () {
     if (data.buttonText && data.buttonText.font) {
       buttons.dyslexia.textContent = data.buttonText.font;
     }
+
+    //Warunek sprawdzający, czy przycisk zoomu ma tekst
     if (data.currentZoomLevel) {
       const buttonText =
         data.currentZoomLevel === 1.0
@@ -256,6 +317,7 @@ document.addEventListener("DOMContentLoaded", function () {
       buttons.zoom.textContent = buttonText;
     }
 
+    //Funkcje wywoływane po kliknięciu przycisków
     buttons.inject.addEventListener("click", async () => {
       await toggleCSSInjection(
         tab.id,

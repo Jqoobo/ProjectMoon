@@ -1,3 +1,4 @@
+//Funkcja, która zapamiętuje style CSS dla unikalnej strony oraz synchronizuje je z popupem
 function insertCSSIfNeeded(tabId, settings) {
   Object.keys(settings).forEach((key) => {
     if (settings[key].isInjected) {
@@ -16,6 +17,7 @@ function insertCSSIfNeeded(tabId, settings) {
   });
 }
 
+//Funkcja, która nasłuchuje aktualizacji zakładek i w przypadku zmiany adresu URL, weryfikuje, czy dla danej strony istnieją ustawienia CSS
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status === "complete" && tab.url) {
     try {

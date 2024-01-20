@@ -2,8 +2,10 @@
 if ("speechSynthesis" in window) {
   let lastSpokenText = "";
   let utterance = new SpeechSynthesisUtterance();
+  //Ustawienia języka
   utterance.lang = "pl-PL";
 
+  //Funkcja, która odtwarza podświetlony tekst
   function speakText(text) {
     if (text !== lastSpokenText) {
       if (window.speechSynthesis.speaking) {
@@ -25,10 +27,12 @@ if ("speechSynthesis" in window) {
     }
   }
 
+  //Funkcja, która sprawdza, czy zaznaczony tekst jest pojedynczym słowem
   function isSingleWord(text) {
     return text.trim().match(/^\S+$/) !== null;
   }
 
+  //Funckja wywoływana po zaznaczeniu tekstu
   document.addEventListener("mouseup", function () {
     let selectedText = window.getSelection().toString();
 
@@ -44,10 +48,12 @@ if ("speechSynthesis" in window) {
     }
   });
 
+  //Funkcja, która synchoronizuje ustawienia głośności z popupem
   chrome.storage.sync.get(["volume"], function (data) {
     utterance.volume = data.volume ? data.volume / 100 : 1;
   });
 
+  //Funkcja, która przesyła ustawienia głośności z popup.js do active.js
   chrome.runtime.onMessage.addListener(function (
     request,
     sender,
@@ -76,6 +82,7 @@ function loadStylesheet(url) {
   });
 }
 
+//Ładowanie czcionki OpenDyslexic oraz wyświetlenie komunikatu w konsoli
 loadStylesheet(chrome.runtime.getURL("assets/css/opendyslexic.css"))
   .then(() => {
     console.log("✅Asset został załadowany (OpenDyslexic)");

@@ -15,9 +15,13 @@ const { title, text } = Astro.props;
   </div>
   <div class="flex flex-wrap">
     <div class="volume-buttons">
-    <button id="muteButton" class="text-white font-[500] text-[14px]">Wycisz</button>
-    <input type="range" id="volumeSlider" min="0" max="100" value="100">
-  </div>
+      <button
+        id="muteButton"
+        class="text-white font-[500] text-[14px] mr-2 min-h-[40px]"
+        >Wycisz</button
+      >
+      <input type="range" id="volumeSlider" min="0" max="100" value="100" />
+    </div>
     <button
       id="inject-css"
       class="text-white font-[500] text-[14px] border-[1px]"
@@ -41,27 +45,26 @@ const { title, text } = Astro.props;
   </div>
 </div>
 
-
-  <style>
-    #inject-css,
-    #zoom-button,
-    #dyslexia-font,
-    #animation-button,
-    #test,
-    #test2 {
-      width: 200px;
-      height: 200px;
-      background-color: #1a202c;
-      cursor: pointer;
-      transition: all 0.2s ease-in-out;
-    }
-    .volume-buttons {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: center;
-      width: 400px;
-      height: 100px;
-      background-color: #1a202c;
-    }
-  </style>
+<style>
+  #inject-css,
+  #zoom-button,
+  #dyslexia-font,
+  #animation-button,
+  #test,
+  #test2 {
+    width: 200px;
+    height: 200px;
+    background-color: #1a202c;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+  }
+  .volume-buttons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 400px;
+    height: 100px;
+    background-color: #1a202c;
+  }
+</style>
