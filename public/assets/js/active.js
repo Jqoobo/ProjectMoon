@@ -90,3 +90,22 @@ loadStylesheet(chrome.runtime.getURL("assets/css/opendyslexic.css"))
   .catch((error) => {
     console.error(error);
   });
+
+//Funkcja, która dodaje tabindex do elementów interaktywnych
+window.onload = function () {
+  var selectors =
+    'a[href], button, input, textarea, select, [role="button"], [onclick], [onkeydown], [onkeyup], [onkeypress]';
+  console.log("🔎Szukanie elementów interaktywnych...");
+  var interactiveElements = document.querySelectorAll(selectors);
+
+  interactiveElements.forEach(function (element) {
+    if (!element.hasAttribute("tabindex")) {
+      element.setAttribute("tabindex", "0");
+      console.log(
+        `✅Element interaktywny został zaindeksowany dla: ${element.tagName} ${
+          element.className ? "." + element.className : ""
+        } ${element.id ? "#" + element.id : ""}`
+      );
+    }
+  });
+};
