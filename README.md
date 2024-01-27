@@ -5,7 +5,7 @@
 
 <p align="center">🔹 Welcome to the Project Moon project!</p> 
 <p align="center">🔹 It's a chrome extension for accessibility. It provides many useful features to make pages more accessible.</p> 
-<p align="center">❗️ Please, be aware, that the plugin does not guarantee full accessibility and problems with some pages may occur </p>
+<p align="center">❗️ Please, be aware, that the plugin does not guarantee full accessibility and problems with some pages may occur.</p>
 &nbsp;
 
 ## 🧞 Commands
