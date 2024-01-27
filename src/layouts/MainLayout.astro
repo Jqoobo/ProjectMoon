@@ -14,6 +14,7 @@ const { title } = Astro.props;
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
+    <link href="https://fonts.cdnfonts.com/css/open-sans" rel="stylesheet" />
     <script is:inline src="assets/js/toggle.js"></script>
     <title>{title}</title>
   </head>
@@ -35,18 +36,25 @@ const { title } = Astro.props;
   }
   html {
     font-family: system-ui, sans-serif;
-    background: #13151a;
+    background: #fff;
     background-size: 224px;
   }
-  code {
-    font-family:
-      Menlo,
-      Monaco,
-      Lucida Console,
-      Liberation Mono,
-      DejaVu Sans Mono,
-      Bitstream Vera Sans Mono,
-      Courier New,
-      monospace;
+  body {
+    font-family: "Open Sans", sans-serif;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #e2e2e2;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #000;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #000;
   }
 </style>

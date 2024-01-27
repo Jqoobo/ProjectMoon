@@ -1,0 +1,355 @@
+---
+interface Props {
+  title: string;
+  text: string;
+}
+const { title, text } = Astro.props;
+---
+
+<div
+  class="w-[400px] min-h-min flex flex-col justify-start items-center bg-white font-['Open Sans']"
+>
+  <div
+    class="border-b-[2px] border-black w-full text-center pt-[1rem] pb-[1.5rem]"
+  >
+    <h1 class="text-black text-[24px] font-[700]">{title}</h1>
+    <p class="text-black text-[16px] font-[500]">{text}</p>
+  </div>
+  <div class="flex flex-wrap">
+    <div class="flex flex-col w-full justify-center items-center pt-[13px]">
+      <span class="text-center">Zmień głośność odczytywanego tekstu</span>
+      <div
+        class="border-b-[1px] border-black flex flex-row justify-center items-center w-full h-[50px] bg-white pb-[10px]"
+      >
+        <button
+          id="muteButton"
+          class="text-black font-[500] text-[16px] mr-2 min-w-[40px] flex-col justify-center items-center gap-[2rem] translate-y-[-2px]"
+          >Wycisz</button
+        >
+        <input
+          type="range"
+          id="volumeSlider"
+          min="0"
+          max="100"
+          value="100"
+          class="volume"
+        />
+      </div>
+    </div>
+    <button
+      id="resetButton"
+      class="text-black font-[500] text-[16px] border-y-[1px] border-r-[1px] border-black flex flex-col justify-center items-center gap-[2rem] w-[200px] h-[200px] bg-white cursor-pointer transition-all duration-200 ease-in-out"
+      ><img
+        src="assets/images/reset.svg"
+        alt="reset"
+        class="w-[40px] h-[40px]"
+      />Reset opcji</button
+    >
+    <button
+      id="contrastButton"
+      class="text-black font-[500] text-[16px] border-y-[1px] border-l-[1px] border-black flex flex-col justify-center items-center gap-[2rem] w-[200px] h-[200px] bg-white cursor-pointer transition-all duration-200 ease-in-out"
+    >
+      <img
+        src="assets/images/contrast.svg"
+        alt="contrast"
+        class="w-[40px] h-[40px]"
+      />
+      <span class="button_text">Kontrast</span>
+    </button>
+    <button
+      id="zoomButton"
+      class="text-black font-[500] text-[16px] border-y-[1px] border-r-[1px] border-black flex flex-col justify-center items-center gap-[2rem] w-[200px] h-[200px] bg-white cursor-pointer transition-all duration-200 ease-in-out"
+    >
+      <img src="assets/images/zoom.svg" alt="zoom" class="w-[40px] h-[40px]" />
+      <span class="button_text">Zoom</span>
+    </button>
+    <button
+      id="variousFontsButton"
+      class="text-black font-[500] text-[16px] border-y-[1px] border-l-[1px] border-black flex flex-col justify-center items-center gap-[2rem] w-[200px] h-[200px] bg-white cursor-pointer transition-all duration-200 ease-in-out"
+    >
+      <img src="assets/images/font.svg" alt="fonts" class="w-[40px] h-[40px]" />
+      <span class="button_text">Przyjazne czcionki</span>
+    </button>
+    <button
+      id="animationButton"
+      class="text-black font-[500] text-[16px] border-y-[1px] border-r-[1px] border-black flex flex-col justify-center items-center gap-[2rem] w-[200px] h-[200px] bg-white cursor-pointer transition-all duration-200 ease-in-out"
+    >
+      <img
+        src="assets/images/noanimation.svg"
+        alt="no-animation"
+        class="w-[40px] h-[40px]"
+      />
+      <span class="button_text">Wyłączenie animacji</span>
+    </button>
+    <button
+      id="cursorButton"
+      class="text-black font-[500] text-[16px] border-y-[1px] border-l-[1px] border-black flex flex-col justify-center items-center gap-[2rem] w-[200px] h-[200px] bg-white cursor-pointer transition-all duration-200 ease-in-out"
+    >
+      <img
+        src="assets/images/cursor.svg"
+        alt="cursor"
+        class="w-[40px] h-[40px]"
+      />
+      <span class="button_text">Kursor</span>
+    </button>
+    <button
+      id="fontSizeButton"
+      class="text-black font-[500] text-[16px] border-y-[1px] border-r-[1px] border-black flex flex-col justify-center items-center gap-[2rem] w-[200px] h-[200px] bg-white cursor-pointer transition-all duration-200 ease-in-out"
+      ><img
+        src="assets/images/fontsize.svg"
+        alt="font-size"
+        class="w-[40px] h-[40px]"
+      /><span class="button_text">Wielkość tekstu</span></button
+    >
+    <button
+      id="linkButton"
+      class="text-black font-[500] text-[16px] border-y-[1px] border-l-[1px] border-black flex flex-col justify-center items-center gap-[2rem] w-[200px] h-[200px] bg-white cursor-pointer transition-all duration-200 ease-in-out"
+      ><img
+        src="assets/images/link.svg"
+        alt="link"
+        class="w-[40px] h-[40px]"
+      /><span class="button_text">Podświetlenie linków</span></button
+    >
+    <button
+      id="letterSpacingButton"
+      class="text-black font-[500] text-[16px] border-y-[1px] border-r-[1px] border-black flex flex-col justify-center items-center gap-[2rem] w-[200px] h-[200px] bg-white cursor-pointer transition-all duration-200 ease-in-out"
+      ><img
+        src="assets/images/letterspacing.svg"
+        alt="letter-spacing"
+        class="w-[40px] h-[40px]"
+      /><span class="button_text">Odstępy znaków</span></button
+    >
+    <button
+      id="lineHeightButton"
+      class="text-black font-[500] text-[16px] border-y-[1px] border-l-[1px] border-black flex flex-col justify-center items-center gap-[2rem] w-[200px] h-[200px] bg-white cursor-pointer transition-all duration-200 ease-in-out"
+      ><img
+        src="assets/images/lineheight.svg"
+        alt="line-height"
+        class="w-[40px] h-[40px]"
+      /><span class="button_text">Wysokość linii</span></button
+    >
+    <button
+      id="alignButton"
+      class="text-black font-[500] text-[16px] border-y-[1px] border-r-[1px] border-black flex flex-col justify-center items-center gap-[2rem] w-[200px] h-[200px] bg-white cursor-pointer transition-all duration-200 ease-in-out"
+      ><img
+        src="assets/images/align.svg"
+        alt="align-justify-left"
+        class="w-[40px] h-[40px]"
+      /><span class="button_text">Wyrównaj tekst</span></button
+    >
+    <button
+      id="saturationButton"
+      class="text-black font-[500] text-[16px] border-y-[1px] border-l-[1px] border-black flex flex-col justify-center items-center gap-[2rem] w-[200px] h-[200px] bg-white cursor-pointer transition-all duration-200 ease-in-out"
+      ><img
+        src="assets/images/saturation.svg"
+        alt="saturation"
+        class="w-[40px] h-[40px]"
+      /><span class="button_text">Zmiana saturacji</span></button
+    >
+    <button
+      id="noSaturationButton"
+      class="text-black font-[500] text-[16px] border-y-[1px] border-r-[1px] border-black flex flex-col justify-center items-center gap-[2rem] w-[200px] h-[200px] bg-white cursor-pointer transition-all duration-200 ease-in-out"
+      ><img
+        src="assets/images/nosaturation.svg"
+        alt="no-saturation"
+        class="w-[40px] h-[40px]"
+      /><span class="button_text">Desaturacja</span></button
+    >
+    <button
+      id="brightnessButton"
+      class="text-black font-[500] text-[16px] border-y-[1px] border-l-[1px] border-black flex flex-col justify-center items-center gap-[2rem] w-[200px] h-[200px] bg-white cursor-pointer transition-all duration-200 ease-in-out"
+      ><img
+        src="assets/images/brightness.svg"
+        alt="brightness"
+        class="w-[40px] h-[40px]"
+      /><span class="button_text">Zmiana jasności</span></button
+    >
+    <button
+      id="noImgButton"
+      class="text-black font-[500] text-[16px] border-t-[1px] border-r-[1px] border-black flex flex-col justify-center items-center gap-[2rem] w-[200px] h-[200px] bg-white cursor-pointer transition-all duration-200 ease-in-out"
+      ><img
+        src="assets/images/noimg.svg"
+        alt="no-img"
+        class="w-[40px] h-[40px]"
+      /><span class="button_text">Ukryj obrazy</span></button
+    >
+    <button
+      id="imgZoomButton"
+      class="text-black font-[500] text-[16px] border-t-[1px] border-l-[1px] border-black flex flex-col justify-center items-center gap-[2rem] w-[200px] h-[200px] bg-white cursor-pointer transition-all duration-200 ease-in-out"
+      ><img
+        src="assets/images/imgzoom.svg"
+        alt="img-zoom"
+        class="w-[40px] h-[40px]"
+      /><span class="button_text">Przybliż obrazy</span></button
+    >
+  </div>
+</div>
+
+<style>
+  input[type="range"].volume {
+    height: 1.5em;
+    -webkit-appearance: none;
+  }
+
+  input[type="range"].volume:hover,
+  input[type="range"].volume:focus {
+    cursor: grab;
+  }
+
+  /*Progress support*/
+  input[type="range"].volume.slider-progress {
+    --range: calc(var(--max) - var(--min));
+    --ratio: calc((var(--value) - var(--min)) / var(--range));
+    --sx: calc(0.5 * 2em + var(--ratio) * (100% - 2em));
+  }
+
+  input[type="range"].volume:focus {
+    outline: none;
+  }
+
+  /*Webkit*/
+  input[type="range"].volume::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 2em;
+    height: 2em;
+    border-radius: 1em;
+    background: #000;
+    border: 0;
+    box-shadow: 0 0 2px black;
+    margin-top: calc(max((1em - 1px - 1px) * 0.5, 0px) - max(2em * 0.5, 0px));
+  }
+
+  input[type="range"].volume::-webkit-slider-runnable-track {
+    height: 1em;
+    border: 1px solid #b2b2b2;
+    border-radius: 1em;
+    background: #e2e2e2;
+    box-shadow: none;
+  }
+
+  input[type="range"].volume::-webkit-slider-thumb:hover {
+    background: #000000;
+  }
+
+  input[type="range"].volume::-webkit-slider-thumb:active {
+    background: #000000;
+  }
+
+  input[type="range"].volume.slider-progress::-webkit-slider-runnable-track {
+    background:
+      linear-gradient(#000000, #000000) 0 / var(--sx) 100% no-repeat,
+      #e2e2e2;
+  }
+
+  input[type="range"].volume.slider-progress:hover::-webkit-slider-runnable-track {
+    background:
+      linear-gradient(#0e0e0e, #0e0e0e) 0 / var(--sx) 100% no-repeat,
+      #e2e2e2;
+  }
+
+  input[type="range"].volume.slider-progress:active::-webkit-slider-runnable-track {
+    background:
+      linear-gradient(#000000, #000000) 0 / var(--sx) 100% no-repeat,
+      #e2e2e2;
+  }
+
+  /*Mozilla*/
+  input[type="range"].volume::-moz-range-thumb {
+    width: max(calc(2em - 0px - 0px), 0px);
+    height: max(calc(2em - 0px - 0px), 0px);
+    border-radius: 1em;
+    background: #e2e2e2;
+    border: 0;
+    box-shadow: 0 0 2px black;
+  }
+
+  input[type="range"].volume::-moz-range-track {
+    height: max(calc(1em - 1px - 1px), 0px);
+    border: 1px solid #b2b2b2;
+    border-radius: 1em;
+    background: #e2e2e2;
+    box-shadow: none;
+  }
+
+  input[type="range"].volume::-moz-range-thumb:hover {
+    background: #000000;
+  }
+
+  input[type="range"].volume::-moz-range-thumb:active {
+    background: #000000;
+  }
+
+  input[type="range"].volume.slider-progress::-moz-range-track {
+    background:
+      linear-gradient(#000000, #000000) 0 / var(--sx) 100% no-repeat,
+      #e2e2e2;
+  }
+
+  input[type="range"].volume.slider-progress:hover::-moz-range-track {
+    background:
+      linear-gradient(#0e0e0e, #0e0e0e) 0 / var(--sx) 100% no-repeat,
+      #e2e2e2;
+  }
+
+  input[type="range"].volume.slider-progress:active::-moz-range-track {
+    background:
+      linear-gradient(#000000, #000000) 0 / var(--sx) 100% no-repeat,
+      #e2e2e2;
+  }
+
+  /*Ms*/
+  input[type="range"].volume::-ms-fill-upper {
+    background: transparent;
+    border-color: transparent;
+  }
+
+  input[type="range"].volume::-ms-fill-lower {
+    background: transparent;
+    border-color: transparent;
+  }
+
+  input[type="range"].volume::-ms-thumb {
+    width: 2em;
+    height: 2em;
+    border-radius: 1em;
+    background: #e2e2e2;
+    border: 0;
+    box-shadow: 0 0 2px black;
+    margin-top: 0;
+    box-sizing: border-box;
+  }
+
+  input[type="range"].volume::-ms-track {
+    height: 1em;
+    border-radius: 1em;
+    background: #e2e2e2;
+    border: 1px solid #b2b2b2;
+    box-shadow: none;
+    box-sizing: border-box;
+  }
+
+  input[type="range"].volume::-ms-thumb:hover {
+    background: #000000;
+  }
+
+  input[type="range"].volume::-ms-thumb:active {
+    background: #000000;
+  }
+
+  input[type="range"].volume.slider-progress::-ms-fill-lower {
+    height: max(calc(1em - 1px - 1px), 0px);
+    border-radius: 1em 0 0 1em;
+    margin: -1px 0 -1px -1px;
+    background: #000000;
+    border: 1px solid #b2b2b2;
+    border-right-width: 0;
+  }
+
+  input[type="range"].volume.slider-progress:hover::-ms-fill-lower {
+    background: #0e0e0e;
+  }
+
+  input[type="range"].volume.slider-progress:active::-ms-fill-lower {
+    background: #000000;
+  }
+</style>

@@ -11,7 +11,10 @@
     {
       "resources": [
         "assets/fonts/OpenDyslexic-Regular.woff",
-        "assets/css/opendyslexic.css"
+        "assets/fonts/OpenSans-Regular.woff",
+        "assets/css/fonts.css",
+        "assets/images/cursor_yellow.svg",
+        "assets/images/cursor_blue.svg"
       ],
       "matches": ["<all_urls>"]
     }

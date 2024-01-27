@@ -67,25 +67,25 @@ if ("speechSynthesis" in window) {
   console.error("Twoja przeglądarka nie obsługuje Web Speech API 😞");
 }
 
-//Ładownanie czcionki OpenDyslexic w postaci assetu
+//Ładowanie czcionek w postaci assetów
 function loadStylesheet(url) {
   return new Promise((resolve, reject) => {
     const link = document.createElement("link");
     link.rel = "stylesheet";
     link.type = "text/css";
     link.crossOrigin = "anonymous";
-    link.id = "projectmoon_opendyslexic_font";
+    link.id = "projectmoon_fonts";
     link.href = url;
     link.onload = resolve;
-    link.onerror = () => reject(`❌Asset nie został załadowany: ${url}`);
+    link.onerror = () => reject(`❌Assety nie zostały załadowane: ${url}`);
     document.head.appendChild(link);
   });
 }
 
-//Ładowanie czcionki OpenDyslexic oraz wyświetlenie komunikatu w konsoli
-loadStylesheet(chrome.runtime.getURL("assets/css/opendyslexic.css"))
+//Ładowanie czcionek oraz wyświetlenie komunikatu w konsoli
+loadStylesheet(chrome.runtime.getURL("assets/css/fonts.css"))
   .then(() => {
-    console.log("✅Asset został załadowany (OpenDyslexic)");
+    console.log("✅Assety zostały załadowane (OpenDyslexic oraz OpenSans)");
   })
   .catch((error) => {
     console.error(error);
@@ -108,4 +108,14 @@ window.onload = function () {
       );
     }
   });
+
+  //Śledzenie zmiany wartości inputa typu range
+  for (let e of document.querySelectorAll(
+    'input[type="range"].slider-progress'
+  )) {
+    e.style.setProperty("--value", e.value);
+    e.style.setProperty("--min", e.min == "" ? "0" : e.min);
+    e.style.setProperty("--max", e.max == "" ? "100" : e.max);
+    e.addEventListener("input", () => e.style.setProperty("--value", e.value));
+  }
 };

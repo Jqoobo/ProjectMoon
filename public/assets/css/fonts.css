@@ -4,3 +4,10 @@
     font-weight: normal;
     font-style: normal;
 }
+
+@font-face {
+    font-family: 'OpenSans';
+    src: url('/assets/fonts/OpenSans-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
